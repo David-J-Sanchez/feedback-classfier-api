@@ -1,0 +1,26 @@
+# Python virtual environment
+venv/
+
+# Python compiled files
+__pycache__/
+*.pyc
+.ipynb_checkpoints/ # If you ever use Jupyter notebooks
+
+# Operating System specific files
+.DS_Store # macOS
+Thumbs.db # Windows
+
+# VS Code specific files (optional, but good practice)
+.vscode/
+
+# Large datasets or temporary files you might not want to commit
+# If your feedback.csv gets very large, you might add it here.
+# For now, we are committing 'data/' and 'artifacts/' so don't uncomment these.
+# data/
+# artifacts/
+
+# NOTE ON ARTIFACTS: For a small demo project, committing artifacts/*.joblib
+# is usually fine. If your models become very large (hundreds of MBs/GBs),
+# you would use a separate system like DVC (Data Version Control)
+# instead of Git for tracking them, and then add artifacts/ to .gitignore.
+# For this project, it's okay for them to be committed.
