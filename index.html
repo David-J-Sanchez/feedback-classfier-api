@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Showcase: Customer Feedback Classification API</title>
+    <!-- Chosen Palette: Warm Neutral Harmony -->
+    <!-- Application Structure Plan: A single-page vertical scrolling layout with a sticky navigation header. This structure guides the user through the project's narrative, from a high-level summary to detailed, interactive sections. A tabbed interface is used for the core "Project Deep Dive" to organize distinct aspects (Development, Performance, API, Collaboration) into digestible, user-driven segments. This is more engaging and less overwhelming than a long, linear document, allowing recruiters or visitors to focus on the areas that interest them most. -->
+    <!-- Visualization & Content Choices: 
+        - Project Overview: Text -> Goal: Inform -> Simple, clear text blocks for immediate context.
+        - Development Journey: Accordion -> Goal: Organize -> Hides complex debugging stories until the user chooses to explore them, keeping the UI clean. Method: HTML/CSS/JS.
+        - Model Performance: Bar Charts -> Goal: Compare/Inform -> Visually compares key metrics (Accuracy, F1, AUC) for the two models, making performance easy to grasp. Library: Chart.js.
+        - API Showcase: Interactive Form -> Goal: Interact -> Simulates the real API, allowing users to "play" with the model's functionality, making the project feel tangible and live. Method: HTML/JS.
+        - LLM Collaboration: Chat Log -> Goal: Inform/Organize -> Presents the AI-assisted development process in a familiar, easy-to-read format, highlighting a modern workflow. Method: Styled HTML/CSS.
+        - UPDATED: ✨ Generate Project Overview: Button -> Goal: Synthesize -> Provides an AI-generated concise overview of the entire project, highlighting key aspects, skills, and innovation. Method: Gemini API (gemini-2.0-flash).
+        - UPDATED: ✨ Generate Usage Examples: Button -> Goal: Illustrate Application -> Provides AI-generated examples of the API's practical use cases in various business contexts. Method: Gemini API (gemini-2.0-flash).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #F8F7F4; /* Warm off-white */
+            color: #403d39; /* Dark coffee brown */
+        }
+        .sticky-nav {
+            background-color: rgba(248, 247, 244, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .tab-active {
+            background-color: #A49E95; /* Muted stone */
+            color: #FFFFFF;
+        }
+        .tab-inactive {
+            background-color: #E7E5E1; /* Light stone */
+            color: #403d39;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .accordion-content.open {
+            max-height: 500px; /* Adjust as needed */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-width: 500px;
+            margin: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <!-- Header & Navigation -->
+    <header id="header" class="sticky top-0 z-50 w-full border-b border-stone-200 sticky-nav">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-lg font-bold text-stone-700">David J. Sánchez | Project Portfolio</h1>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#overview" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">Overview</a>
+                    <a href="#tech-stack" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">Tech Stack</a>
+                    <a href="#deep-dive" class="text-sm font-medium text-stone-600 hover:text-stone-900 transition-colors">Deep Dive</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Project Title Section -->
+        <section id="title-section" class="text-center py-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight text-stone-800">Customer Feedback Classification API</h2>
+            <p class="mt-4 text-lg text-stone-600">A complete Machine Learning system for Sentiment & Intent Analysis, from training to deployment.</p>
+            <div class="mt-8">
+                <a href="https://github.com/David-J-Sanchez/feedback-classfier-api.git" target="_blank" class="inline-block bg-stone-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-stone-700 transition-transform transform hover:-translate-y-1">
+                    View on GitHub
+                </a>
+                <!-- UPDATED BUTTON TEXT: Now Generate Project Overview -->
+                <button id="summarize-journey-btn" class="ml-4 inline-block bg-emerald-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-emerald-700 transition-transform transform hover:-translate-y-1">
+                    ✨ Generate Project Overview
+                </button>
+            </div>
+            <!-- Output div for Project Overview -->
+            <div id="journey-summary-output" class="mt-8 bg-emerald-50 p-4 rounded-lg text-emerald-800 hidden">
+                <p class="font-semibold mb-2">Project Overview Summary:</p>
+                <div id="journey-summary-text"></div>
+                <div id="journey-summary-loading" class="hidden text-center text-emerald-600">Generating...</div>
+            </div>
+        </section>
+
+        <!-- Overview Section -->
+        <section id="overview" class="py-16 border-t border-stone-200">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-3xl font-bold text-center text-stone-800 mb-8">Project Overview</h3>
+                <div class="bg-white p-8 rounded-xl shadow-sm space-y-6">
+                    <div>
+                        <h4 class="text-xl font-semibold mb-2 text-stone-700">Introduction</h4>
+                        <p class="text-stone-600 leading-relaxed">This project develops a robust API for real-time classification of customer feedback into two key categories: Sentiment (positive/negative) and Intent (praise/complaint). Built with Python, Scikit-learn, XGBoost, and FastAPI, the system provides a clear demonstration of end-to-end Machine Learning model deployment, from data preprocessing and model training to API exposure and critical debugging.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold mb-2 text-stone-700">Core Features & Functionality</h4>
+                        <ul class="list-disc list-inside space-y-2 text-stone-600">
+                            <li><strong>Dual Classification:</strong> Predicts both the sentiment and the intent of a given text input.</li>
+                            <li><strong>Machine Learning Models:</strong> Utilizes XGBoost Classifiers for high-performance predictions.</li>
+                            <li><strong>RESTful API:</strong> Developed using FastAPI, offering a modern, high-performance, and auto-documenting web interface.</li>
+                            <li><strong>Consistent Preprocessing:</strong> Implements a centralized text cleaning utility to ensure identical logic is applied during training and live inference.</li>
+                            <li><strong>Robust Model Loading:</strong> Incorporates error handling and diagnostic checks (MD5 hashes, vocabulary sizes) on API startup.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Section -->
+        <section id="tech-stack" class="py-16 bg-stone-100 rounded-xl">
+            <div class="max-w-4xl mx-auto text-center">
+                <h3 class="text-3xl font-bold text-stone-800 mb-8">Technologies & Skills</h3>
+                <div id="tech-list" class="flex flex-wrap justify-center gap-4">
+                    <!-- Tech items will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Deep Dive Section with Tabs -->
+        <section id="deep-dive" class="py-16">
+            <div class="max-w-5xl mx-auto">
+                <h3 class="text-3xl font-bold text-center text-stone-800 mb-12">Project Deep Dive</h3>
+                
+                <!-- Tab Buttons -->
+                <div class="flex justify-center mb-8 border-b border-stone-200">
+                    <button data-tab="journey" class="tab-btn tab-active py-3 px-6 text-sm font-semibold rounded-t-lg transition-colors">Development Journey</button>
+                    <button data-tab="performance" class="tab-btn tab-inactive py-3 px-6 text-sm font-semibold rounded-t-lg transition-colors">Model Performance</button>
+                    <button data-tab="api" class="tab-btn tab-inactive py-3 px-6 text-sm font-semibold rounded-t-lg transition-colors">API in Action</button>
+                    <button data-tab="collaboration" class="tab-btn tab-inactive py-3 px-6 text-sm font-semibold rounded-t-lg transition-colors">LLM Collaboration</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="tab-content" class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <!-- Development Journey Tab -->
+                    <div id="journey-content" class="tab-pane">
+                        <h4 class="text-2xl font-bold text-stone-700 mb-6 text-center">Debugging & Problem-Solving</h4>
+                        <p class="text-center text-stone-600 mb-8">A key part of this project was navigating and resolving common ML development challenges. This section highlights the iterative process of debugging and refinement.</p>
+                        <!-- UPDATED BUTTON: Now Generate Usage Examples -->
+                        <button id="generate-usage-examples-btn" class="mb-6 w-full bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition">
+                            ✨ Generate Usage Examples
+                        </button>
+                        <!-- UPDATED OUTPUT DIV: Now for Usage Examples -->
+                        <div id="usage-examples-output" class="mt-4 bg-blue-50 p-4 rounded-lg text-blue-800 hidden">
+                            <p class="font-semibold mb-2">Usage Examples:</p>
+                            <div id="usage-examples-text"></div>
+                            <div id="usage-examples-loading" class="hidden text-center text-blue-600">Generating...</div>
+                        </div>
+                        <div id="journey-accordion" class="space-y-4">
+                            <!-- Accordion items injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Model Performance Tab -->
+                    <div id="performance-content" class="tab-pane hidden">
+                        <h4 class="text-2xl font-bold text-stone-700 mb-6 text-center">Model Training & Performance</h4>
+                        <p class="text-center text-stone-600 mb-8">Two distinct XGBoost models were trained for sentiment and intent classification. Below are their performance metrics on the test set.</p>
+                        <div class="grid md:grid-cols-2 gap-8 mt-8">
+                            <div class="text-center">
+                                <h5 class="text-xl font-semibold text-stone-700 mb-4">Sentiment Model Metrics</h5>
+                                <div class="chart-container">
+                                    <canvas id="sentimentChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <h5 class="text-xl font-semibold text-stone-700 mb-4">Intent Model Metrics</h5>
+                                <div class="chart-container">
+                                    <canvas id="intentChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API in Action Tab -->
+                    <div id="api-content" class="tab-pane hidden">
+                        <h4 class="text-2xl font-bold text-stone-700 mb-6 text-center">API Showcase</h4>
+                        <p class="text-center text-stone-600 mb-8">Interact with a simulation of the final API. Enter some text below to see how the models classify sentiment and intent.</p>
+                        <div class="max-w-2xl mx-auto">
+                            <textarea id="api-input" class="w-full p-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-stone-400 focus:border-stone-400 transition" rows="4" placeholder="e.g., 'The service was absolutely amazing!' or 'This product arrived broken.'"></textarea>
+                            <button id="predict-btn" class="mt-4 w-full bg-stone-800 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-stone-700 transition">Classify Feedback</button>
+                            <div class="mt-6">
+                                <h5 class="font-semibold text-stone-700">API Response:</h5>
+                                <pre id="api-output" class="bg-stone-800 text-white text-sm p-4 rounded-lg mt-2 overflow-x-auto"><code>{
+  "message": "Enter text above and click 'Classify Feedback' to see the result."
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LLM Collaboration Tab -->
+                    <div id="collaboration-content" class="tab-pane hidden">
+                        <h4 class="text-2xl font-bold text-stone-700 mb-6 text-center">AI-Assisted Development</h4>
+                        <p class="text-center text-stone-600 mb-8">This project was developed in collaboration with an AI assistant. This section showcases key interactions, demonstrating a modern workflow for debugging, code generation, and project documentation.</p>
+                        <div id="llm-chat-log" class="space-y-6 max-w-3xl mx-auto">
+                           <!-- Chat log injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-8 border-t border-stone-200">
+        <p class="text-sm text-stone-500">&copy; 2025 David J. Sánchez. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const API_KEY = ""; // Gemini API key - Canvas will inject this at runtime
+
+            // Data for dynamic content
+            const techData = ['Machine Learning', 'NLP', 'FastAPI', 'Python', 'XGBoost', 'Scikit-learn', 'Pandas', 'API Development', 'Git', 'Debugging'];
+            
+            const journeyData = [
+                {
+                    title: 'Module Import Challenges (ModuleNotFoundError)',
+                    description: "Encountered `ModuleNotFoundError` for custom `utils` module. This was a critical config error, not a data issue. Resolved by understanding Python's `sys.path` behavior and running scripts as modules (`python -m model.train`) to ensure the project root was discoverable. Also added `__init__.py` to define `utils` as a package.",
+                    type: 'Config Error'
+                },
+                {
+                    title: 'Data Preprocessing & Training Issues (ValueError: NaN)',
+                    description: "The XGBoost model failed to train due to `NaN` values in the target labels. Debug prints revealed that inconsistent casing and whitespace in the 'Sentiment' column (e.g., ' Positive ') caused the `.map()` function to fail. The fix was to apply a centralized `clean()` function (lowercase, strip whitespace) to the label column *before* mapping and to drop any remaining nulls *after* mapping.",
+                    type: 'Data Issue'
+                },
+                {
+                    title: 'API Prediction Mismatch & Inconsistency',
+                    description: "The live API produced incorrect predictions with high confidence, contradicting the model's training performance. The root cause was a preprocessing mismatch (pipeline drift) where the API was not applying the same `clean()` function to incoming text as the training scripts. Enforcing the use of the shared `clean()` function in the API endpoint resolved the inconsistency.",
+                    type: 'Code Error'
+                }
+            ];
+
+            const modelData = {
+                sentiment: {
+                    labels: ['Accuracy', 'F1 Score', 'ROC-AUC'],
+                    values: [0.75, 0.81, 0.88]
+                },
+                intent: {
+                    labels: ['Accuracy', 'F1 Score', 'ROC-AUC'],
+                    values: [0.947, 0.952, 1.0]
+                }
+            };
+
+            const llmData = [
+                {
+                    speaker: 'user',
+                    text: 'Request for GitHub & CV Context: "First i need you to give ALL THE CONTEXT... basically present the project in github. And to add it to my CV..."'
+                },
+                {
+                    speaker: 'ai',
+                    text: 'Response: Provided a comprehensive README structure detailing the project overview, technical stack, development journey, skills applied, and setup instructions.'
+                },
+                {
+                    speaker: 'outcome',
+                    text: 'Learning Outcome: Understood how to effectively document an ML project for a professional portfolio, highlighting not just the final product but also the critical problem-solving process and challenges overcome.'
+                },
+                {
+                    speaker: 'user',
+                    text: 'Debugging `ValueError: NaN` in Training: "OUTPUT for the new patch: ... ValueError: Invalid classes inferred from unique values of `y` ... got [ 0. 1. nan]"'
+                },
+                {
+                    speaker: 'ai',
+                    text: 'Response: Identified that `NaN`s were created *after* `dropna` because the `.map()` function failed on un-cleaned labels. The solution was to apply `clean()` to the label column first, then map, then drop any resulting nulls.'
+                },
+                {
+                    speaker: 'outcome',
+                    text: 'Learning Outcome: Learned the importance of preprocessing consistency and the precise order of operations in a data cleaning pipeline, especially when handling categorical labels.'
+                }
+            ];
+
+            // Populate Tech Stack
+            const techList = document.getElementById('tech-list');
+            techData.forEach(tech => {
+                const techEl = document.createElement('span');
+                techEl.className = 'bg-white text-stone-700 text-sm font-medium px-4 py-2 rounded-full shadow-sm';
+                techEl.textContent = tech;
+                techList.appendChild(techEl);
+            });
+
+            // Populate Development Journey Accordion
+            const accordionContainer = document.getElementById('journey-accordion');
+            journeyData.forEach((item, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'border border-stone-200 rounded-lg';
+                wrapper.innerHTML = `
+                    <button class="accordion-btn w-full text-left p-4 flex justify-between items-center bg-stone-50 hover:bg-stone-100 transition-colors">
+                        <span class="font-semibold text-stone-700">${item.title}</span>
+                        <span class="text-xl text-stone-500 transform transition-transform duration-300">+</span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4">
+                        <p class="text-stone-600 mt-2">${item.description}</p>
+                        <span class="inline-block mt-3 bg-stone-200 text-stone-700 text-xs font-bold px-2 py-1 rounded-full">${item.type}</span>
+                    </div>
+                `;
+                accordionContainer.appendChild(wrapper);
+            });
+            
+            // Accordion Logic
+            accordionContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('.accordion-btn');
+                if (btn) {
+                    const content = btn.nextElementSibling;
+                    const icon = btn.querySelector('span:last-child');
+                    const isOpen = content.classList.contains('open');
+
+                    // Close all others
+                    accordionContainer.querySelectorAll('.accordion-content.open').forEach(openContent => {
+                        if (openContent !== content) {
+                            openContent.classList.remove('open');
+                            openContent.previousElementSibling.querySelector('span:last-child').classList.remove('rotate-45');
+                            openContent.previousElementSibling.querySelector('span:last-child').textContent = '+';
+                        }
+                    });
+                    
+                    // Toggle current
+                    content.classList.toggle('open');
+                    if (!isOpen) {
+                        icon.classList.add('rotate-45');
+                        icon.textContent = '+';
+                    } else {
+                        icon.classList.remove('rotate-45');
+                        icon.textContent = '+';
+                    }
+                }
+            });
+
+            // Tab Logic
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            let sentimentChartInstance, intentChartInstance;
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tab = button.dataset.tab;
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('tab-inactive');
+                    });
+                    button.classList.add('tab-active');
+                    button.classList.remove('tab-inactive');
+
+                    tabPanes.forEach(pane => {
+                        if (pane.id === `${tab}-content`) {
+                            pane.classList.remove('hidden');
+                        } else {
+                            pane.classList.add('hidden');
+                        }
+                    });
+                    
+                    if (tab === 'performance') {
+                        if (!sentimentChartInstance) createSentimentChart();
+                        if (!intentChartInstance) createIntentChart();
+                    }
+                });
+            });
+
+            // Chart Creation
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 1.0,
+                        grid: { color: '#E7E5E1' },
+                        ticks: { color: '#6b7280' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#6b7280' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#403d39',
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 12 },
+                        padding: 10,
+                        cornerRadius: 4
+                    }
+                }
+            };
+
+            function createSentimentChart() {
+                const ctx = document.getElementById('sentimentChart').getContext('2d');
+                sentimentChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: modelData.sentiment.labels,
+                        datasets: [{
+                            label: 'Score',
+                            data: modelData.sentiment.values,
+                            backgroundColor: ['#A49E95', '#C7C1B8', '#E7E5E1'],
+                            borderColor: '#403d39',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            function createIntentChart() {
+                const ctx = document.getElementById('intentChart').getContext('2d');
+                intentChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: modelData.intent.labels,
+                        datasets: [{
+                            label: 'Score',
+                            data: modelData.intent.values,
+                            backgroundColor: ['#A49E95', '#C7C1B8', '#E7E5E1'],
+                            borderColor: '#403d39',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
+
+            // API Simulation Logic
+            const predictBtn = document.getElementById('predict-btn');
+            const apiInput = document.getElementById('api-input');
+            const apiOutput = document.querySelector('#api-output code');
+
+            predictBtn.addEventListener('click', () => {
+                const text = apiInput.value.trim().toLowerCase();
+                let sentiment = 'negative';
+                let sentiment_confidence = Math.random() * 0.2 + 0.75; // 0.75-0.95
+                let intent = 'complaint';
+                let intent_confidence = Math.random() * 0.2 + 0.78; // 0.78-0.98
+
+                if (text.includes('amazing') || text.includes('love') || text.includes('great') || text.includes('fantastic')) {
+                    sentiment = 'positive';
+                    intent = 'praise';
+                }
+                
+                const response = {
+                    input_text: apiInput.value,
+                    sentiment,
+                    sentiment_confidence: parseFloat(sentiment_confidence.toFixed(4)),
+                    intent,
+                    intent_confidence: parseFloat(intent_confidence.toFixed(4))
+                };
+                
+                apiOutput.textContent = JSON.stringify(response, null, 2);
+            });
+
+            // Gemini API Integration
+            async function callGeminiAPI(prompt) {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    if (result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        return result.candidates[0].content.parts[0].text;
+                    } else {
+                        console.error("Gemini API response structure unexpected:", result);
+                        return "Error: Could not get a response from the AI.";
+                    }
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return "Error: Failed to connect to AI service.";
+                }
+            }
+
+            // ✨ Generate Project Overview Feature (Updated from Summarize Development Journey)
+            const summarizeJourneyBtn = document.getElementById('summarize-journey-btn'); // ID remains for simplicity
+            const journeySummaryOutput = document.getElementById('journey-summary-output'); // ID remains for simplicity
+            const journeySummaryText = document.getElementById('journey-summary-text');
+            const journeySummaryLoading = document.getElementById('journey-summary-loading');
+
+            summarizeJourneyBtn.addEventListener('click', async () => {
+                journeySummaryOutput.classList.remove('hidden');
+                journeySummaryText.textContent = '';
+                journeySummaryLoading.classList.remove('hidden');
+
+                const projectIntro = document.querySelector('#overview p').textContent;
+                const projectFeatures = Array.from(document.querySelectorAll('#overview ul li')).map(li => li.textContent).join('\n');
+                const techSkills = techData.join(', ');
+
+                const prompt = `Generate a concise, impactful 5-6 line summary of the entire 'Customer Feedback Classification API' project. Highlight key aspects like Machine Learning, NLP, XGBoost, FastAPI, and robust deployment. Emphasize its value in transforming raw feedback into actionable insights and showcase the innovative use of AI in development. Include keywords related to the project's core functionality and technologies.`;
+                
+                const summary = await callGeminiAPI(prompt);
+                
+                journeySummaryLoading.classList.add('hidden');
+                journeySummaryText.textContent = summary;
+            });
+
+            // ✨ Generate Usage Examples Feature
+            const generateUsageExamplesBtn = document.getElementById('generate-usage-examples-btn');
+            const usageExamplesOutput = document.getElementById('usage-examples-output');
+            const usageExamplesText = document.getElementById('usage-examples-text');
+            const usageExamplesLoading = document.getElementById('usage-examples-loading');
+
+            generateUsageExamplesBtn.addEventListener('click', async () => {
+                usageExamplesOutput.classList.remove('hidden');
+                usageExamplesText.textContent = '';
+                usageExamplesLoading.classList.remove('hidden');
+
+                const projectIntro = document.querySelector('#overview p').textContent;
+                const projectFeatures = Array.from(document.querySelectorAll('#overview ul li')).map(li => li.textContent).join('\n');
+                const techSkills = techData.join(', ');
+
+                const prompt = `Provide 3 distinct, concise examples of how a "Customer Feedback Classification API" (like this project) could be utilized in different business contexts. For each example, briefly describe the business type, a typical use case, and the benefit derived from using the API.
+                
+                Project Overview: ${projectIntro}
+                Core Features: ${projectFeatures}
+                Technologies/Skills: ${techSkills}`;
+                
+                const examples = await callGeminiAPI(prompt);
+                
+                usageExamplesLoading.classList.add('hidden');
+                usageExamplesText.textContent = examples;
+            });
+
+            // Populate LLM Chat Log
+            const chatLog = document.getElementById('llm-chat-log');
+            llmData.forEach(msg => {
+                const msgWrapper = document.createElement('div');
+                if (msg.speaker === 'user') {
+                    msgWrapper.className = 'bg-stone-100 p-4 rounded-lg rounded-br-none';
+                    msgWrapper.innerHTML = `<p class="font-semibold text-sm text-stone-800 mb-1">You Asked:</p><p class="text-stone-600 italic">"${msg.text}"</p>`;
+                } else if (msg.speaker === 'ai') {
+                    msgWrapper.className = 'bg-blue-50 p-4 rounded-lg rounded-bl-none';
+                    msgWrapper.innerHTML = `<p class="font-semibold text-sm text-blue-800 mb-1">AI Responded:</p><p class="text-blue-700">${msg.text}</p>`;
+                } else { // outcome
+                    msgWrapper.className = 'bg-emerald-50 border-l-4 border-emerald-400 p-4';
+                    msgWrapper.innerHTML = `<p class="font-semibold text-sm text-emerald-800 mb-1">💡 Learning Outcome:</p><p class="text-emerald-700">${msg.text}</p>`;
+                }
+                chatLog.appendChild(msgWrapper);
+            });
+
+        });
+    </script>
+</body>
+</html>

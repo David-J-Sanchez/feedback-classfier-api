@@ -95,5 +95,3 @@ Text;Sentiment;Source;Date/Time;User ID;Location;Confidence Score
 """I can't stop listening to this song. It's my new favorite!"""; Positive; Spotify;3/7/2023 09:17; musiclover789; Berlin;0.91
 """Their website is so confusing and poorly designed."""; Negative; Website Review;3/7/2023 11:59; user789; Toronto;0.68
 """I had an incredible experience at the theme park. So much fun!"""; Positive; Trip Report;3/7/2023 14:40; thrillseeker1; Orlando;0.89
-;;;;;;
-;;;;;;
