@@ -12,8 +12,8 @@
         - Model Performance: Bar Charts -> Goal: Compare/Inform -> Visually compares key metrics (Accuracy, F1, AUC) for the two models, making performance easy to grasp. Library: Chart.js.
         - API Showcase: Interactive Form -> Goal: Interact -> Simulates the real API, allowing users to "play" with the model's functionality, making the project feel tangible and live. Method: HTML/JS.
         - LLM Collaboration: Chat Log -> Goal: Inform/Organize -> Presents the AI-assisted development process in a familiar, easy-to-read format, highlighting a modern workflow. Method: Styled HTML/CSS.
-        - UPDATED: ✨ Generate Project Overview: Button -> Goal: Synthesize -> Provides an AI-generated concise overview of the entire project, highlighting key aspects, skills, and innovation. Method: Gemini API (gemini-2.0-flash).
-        - UPDATED: ✨ Generate Usage Examples: Button -> Goal: Illustrate Application -> Provides AI-generated examples of the API's practical use cases in various business contexts. Method: Gemini API (gemini-2.0-flash).
+        - UPDATED: ✨ Generate Project Overview: Button -> Goal: Synthesize -> Provides an AI-generated concise overview of the entire project, highlighting key aspects, skills, and innovation. Method: Gemini API (gemini-2.0-flash). Content is now pre-generated for static hosting.
+        - UPDATED: ✨ Generate Usage Examples: Button -> Goal: Illustrate Application -> Provides AI-generated examples of the API's practical use cases in various business contexts. Method: Gemini API (gemini-2.0-flash). Content is now pre-generated for static hosting.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -93,6 +93,7 @@
                 <p class="font-semibold mb-2">Project Overview Summary:</p>
                 <div id="journey-summary-text"></div>
                 <div id="journey-summary-loading" class="hidden text-center text-emerald-600">Generating...</div>
+                <p class="text-xs text-stone-500 mt-2"><i>(Content pre-generated for static hosting)</i></p>
             </div>
         </section>
 
@@ -157,6 +158,7 @@
                             <p class="font-semibold mb-2">Usage Examples:</p>
                             <div id="usage-examples-text"></div>
                             <div id="usage-examples-loading" class="hidden text-center text-blue-600">Generating...</div>
+                            <p class="text-xs text-stone-500 mt-2"><i>(Content pre-generated for static hosting)</i></p>
                         </div>
                         <div id="journey-accordion" class="space-y-4">
                             <!-- Accordion items injected by JS -->
@@ -219,8 +221,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const API_KEY = ""; // Gemini API key - Canvas will inject this at runtime
-
             // Data for dynamic content
             const techData = ['Machine Learning', 'NLP', 'FastAPI', 'Python', 'XGBoost', 'Scikit-learn', 'Pandas', 'API Development', 'Git', 'Debugging'];
             
@@ -279,6 +279,14 @@
                     text: 'Learning Outcome: Learned the importance of preprocessing consistency and the precise order of operations in a data cleaning pipeline, especially when handling categorical labels.'
                 }
             ];
+
+            // --- Pre-generated Content for Static Hosting ---
+            const preGeneratedProjectOverview = `This project delivers an innovative Customer Feedback Classification API, leveraging Machine Learning and Natural Language Processing to instantly categorize sentiment (positive/negative) and intent (praise/complaint). Built with Python, XGBoost, and FastAPI, it showcases end-to-end ML deployment, robust debugging, and efficient API development. It's designed to transform raw feedback into actionable business intelligence, demonstrating strong skills in data science and MLOps.`;
+
+            const preGeneratedUsageExamples = `1.  **E-commerce Customer Service:** An online retailer can use the API to automatically route incoming customer emails or chat messages. High-ticket complaints are immediately flagged for urgent human review, while praise messages can be used for marketing testimonials or to identify top-performing products/services.
+2.  **Restaurant Chain Management:** A restaurant group can analyze daily customer reviews from various platforms. The API identifies common complaints (e.g., "slow service," "cold food") across locations for operational improvements, and aggregates praise to recognize successful branches or specific menu items.
+3.  **Healthcare Patient Feedback:** A hospital system can classify patient comments from surveys or online portals. The API quickly identifies critical complaints related to patient safety or staff professionalism, allowing for rapid intervention, while positive feedback highlights areas of excellent care.`;
+            // --- End Pre-generated Content ---
 
             // Populate Tech Stack
             const techList = document.getElementById('tech-list');
@@ -461,80 +469,36 @@
                 apiOutput.textContent = JSON.stringify(response, null, 2);
             });
 
-            // Gemini API Integration
-            async function callGeminiAPI(prompt) {
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-                
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    if (result.candidates && result.candidates.length > 0 &&
-                        result.candidates[0].content && result.candidates[0].content.parts &&
-                        result.candidates[0].content.parts.length > 0) {
-                        return result.candidates[0].content.parts[0].text;
-                    } else {
-                        console.error("Gemini API response structure unexpected:", result);
-                        return "Error: Could not get a response from the AI.";
-                    }
-                } catch (error) {
-                    console.error("Error calling Gemini API:", error);
-                    return "Error: Failed to connect to AI service.";
-                }
-            }
-
-            // ✨ Generate Project Overview Feature (Updated from Summarize Development Journey)
-            const summarizeJourneyBtn = document.getElementById('summarize-journey-btn'); // ID remains for simplicity
-            const journeySummaryOutput = document.getElementById('journey-summary-output'); // ID remains for simplicity
+            // ✨ Generate Project Overview Feature (Now displays pre-generated content)
+            const summarizeJourneyBtn = document.getElementById('summarize-journey-btn');
+            const journeySummaryOutput = document.getElementById('journey-summary-output');
             const journeySummaryText = document.getElementById('journey-summary-text');
             const journeySummaryLoading = document.getElementById('journey-summary-loading');
 
-            summarizeJourneyBtn.addEventListener('click', async () => {
+            summarizeJourneyBtn.addEventListener('click', () => {
                 journeySummaryOutput.classList.remove('hidden');
                 journeySummaryText.textContent = '';
                 journeySummaryLoading.classList.remove('hidden');
-
-                const projectIntro = document.querySelector('#overview p').textContent;
-                const projectFeatures = Array.from(document.querySelectorAll('#overview ul li')).map(li => li.textContent).join('\n');
-                const techSkills = techData.join(', ');
-
-                const prompt = `Generate a concise, impactful 5-6 line summary of the entire 'Customer Feedback Classification API' project. Highlight key aspects like Machine Learning, NLP, XGBoost, FastAPI, and robust deployment. Emphasize its value in transforming raw feedback into actionable insights and showcase the innovative use of AI in development. Include keywords related to the project's core functionality and technologies.`;
                 
-                const summary = await callGeminiAPI(prompt);
-                
+                // Display pre-generated content
+                journeySummaryText.textContent = preGeneratedProjectOverview;
                 journeySummaryLoading.classList.add('hidden');
-                journeySummaryText.textContent = summary;
             });
 
-            // ✨ Generate Usage Examples Feature
+            // ✨ Generate Usage Examples Feature (Now displays pre-generated content)
             const generateUsageExamplesBtn = document.getElementById('generate-usage-examples-btn');
             const usageExamplesOutput = document.getElementById('usage-examples-output');
             const usageExamplesText = document.getElementById('usage-examples-text');
             const usageExamplesLoading = document.getElementById('usage-examples-loading');
 
-            generateUsageExamplesBtn.addEventListener('click', async () => {
+            generateUsageExamplesBtn.addEventListener('click', () => {
                 usageExamplesOutput.classList.remove('hidden');
                 usageExamplesText.textContent = '';
                 usageExamplesLoading.classList.remove('hidden');
-
-                const projectIntro = document.querySelector('#overview p').textContent;
-                const projectFeatures = Array.from(document.querySelectorAll('#overview ul li')).map(li => li.textContent).join('\n');
-                const techSkills = techData.join(', ');
-
-                const prompt = `Provide 3 distinct, concise examples of how a "Customer Feedback Classification API" (like this project) could be utilized in different business contexts. For each example, briefly describe the business type, a typical use case, and the benefit derived from using the API.
                 
-                Project Overview: ${projectIntro}
-                Core Features: ${projectFeatures}
-                Technologies/Skills: ${techSkills}`;
-                
-                const examples = await callGeminiAPI(prompt);
-                
+                // Display pre-generated content
+                usageExamplesText.textContent = preGeneratedUsageExamples;
                 usageExamplesLoading.classList.add('hidden');
-                usageExamplesText.textContent = examples;
             });
 
             // Populate LLM Chat Log
